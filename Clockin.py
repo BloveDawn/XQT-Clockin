@@ -1,5 +1,6 @@
 import random
 import requests
+from fake_useragent import UserAgent
 import json
 import time
 import sys
@@ -21,9 +22,7 @@ DATA = {
     'is_verify': '0',
 }
 
-HEADER = {
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Redmi K30 5G Build/QKQ1.191222.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.99 Mobile Safari/537.36 Mobads'
-}
+HEADER = {'User-Agent': ''}
 
 def Clockin(id:str, address:str):
     # Parameters check
@@ -41,7 +40,11 @@ def Clockin(id:str, address:str):
     log_file.write('[!] Timestamp:' + str(time.time()) + '\n')
     
     # Input field
-    DATA['title'] = '36.' + str(random.randint(0, 8))
+    HEADER['User-Agent'] = UserAgent().random # random User-Agent
+    if HEADER['User-Agent'] == '' or None: # default ua
+        HEADER['User-Agent'] = 'Mozilla/5.0 (Linux; Android 10; Redmi K30 5G Build/QKQ1.191222.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.99 Mobile Safari/537.36 Mobads'
+    
+    DATA['title'] = '36.' + str(random.randint(0, 8)) # temperature from 36.0 to 36.8
     DATA['mobile'] = id
     
     if DATA['mobile'] == '':
@@ -63,26 +66,40 @@ def Clockin(id:str, address:str):
     DATA['district'] = address_list[2]
     
     # Post to URL
-    page = requests.post(url=URL, data=DATA, headers=HEADER)
-    code = json.loads(page.text)['code']
-    msg = json.loads(page.text)['msg']
+    
+    response_page = requests.post(url=URL, data=DATA, headers=HEADER).text
+    try: # try to load response json
+        response_json_data = json.loads(response_page)
+    except Exception as e:
+        log_file.write('[-] Json load error: ' + str(e) + '\n')
+        log_file.write('[!] Original response page text:\n' + response_page + '\n')
+        log_file.flush()
+        log_file.close()
+        print('[-] Clockin server return error! ID:' + id)
+        return
+    response_code = response_json_data['code']
+    response_msg = response_json_data['msg']
     
     # Print info to log file
-    if code == '400':
+    if response_code == '400':
         log_file.write('[-] Error 400\n')
         log_file.write('[-]')
-    elif code == '200':
+    elif response_code == '200':
         log_file.write('[+] Success 200\n')
         log_file.write('[+]')
     else:
-        log_file.write('[-] Unknow Error\n')
+        log_file.write('[-] Unknow Error Code:' + str(response_code) + '\n')
         log_file.write('[-]')
-    log_file.write(' Msg:' + str(msg) + '\n')
+    log_file.write(' Message: ' + str(response_msg) + '\n')
     
-    log_file.write('[!] URL:' + str(URL) + '\n')
-    log_file.write('[!] DATA:' + str(DATA) + '\n')
-    log_file.write('[!] HEAD:' + str(HEADER) + '\n')
-    log_file.write('[!] RetData:' + str(page.text) + '\n')
+    log_file.write('[!] Request post URL: ' + str(URL) + '\n')
+    log_file.write('[!] Request post data: ' + str(DATA) + '\n')
+    log_file.write('[!] Request head data: ' + str(HEADER) + '\n')
+    log_file.write('[!] Response data: ' + str(response_json_data) + '\n')
+    
+    # release log file
+    log_file.flush()
+    log_file.close()
 
 if __name__ == "__main__":
     # Get id list from file 'id_save.txt'
@@ -105,4 +122,4 @@ if __name__ == "__main__":
             print('[-] Clockin Error!')
             err_log = open(run_path + 'imp-error.log', 'a+')
             err_log.write('[-] Error ' + str(time.time()) + ':\n' + str(e) + '\n\n')
-        time.sleep(20) # clock in every 20 seconds
+        time.sleep(15) # clock in every 15 seconds

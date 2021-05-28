@@ -25,6 +25,7 @@ Good luck.
 - Install python environment
 - Install dependencies
   - `pip install requests`
+  - `pip install fake_useragent`
 
 ### 3.Enter information
 
