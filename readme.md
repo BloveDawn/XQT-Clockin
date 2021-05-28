@@ -14,10 +14,14 @@ This script can run on any operating system, but I recommend using a cloud serve
 
 You can use `XQT-AutoSetup.sh` to **AUTO** init env and setup.
 
-`curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/XQT-AutoSetup.sh" | zsh`
-
 > **Note: You need `zsh` to run this shell script.**  
 > Install zsh: `apt install zsh`
+>
+> If you are from **mainland China**, using the **Gitee** link below will speed up deployment.
+
+Download from Gitee(China): `curl -fsSL "https://gitee.com/blovedawn/XQT-Clockin/raw/main/XQT-AutoSetup.sh" | zsh`
+
+Download from GitHub: `curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/XQT-AutoSetup.sh" | zsh`
 
 ### 1.You need a VPS server
 
