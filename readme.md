@@ -12,6 +12,13 @@ This is an automatic check-in script of Shanxi Xiao Qi Tong, which can realize m
 
 This script can run on any operating system, but I recommend using a cloud server for deployment, which will save you the trouble of starting this script every day.
 
+You can use `XQT-AutoSetup.sh` to **AUTO** init env and setup.
+
+`curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/XQT-AutoSetup.sh" | zsh`
+
+> **Note: You need `zsh` to run this shell script.**  
+> Install zsh: `apt install zsh`
+
 ### 1.You need a VPS server
 
 You can purchase student plan cloud servers from cloud service providers such as Baidu Cloud, Huawei Cloud, Alibaba Cloud, and Tencent Cloud.
@@ -39,13 +46,20 @@ Write the personal information of the person who needs to sign in to the file 'i
 140501199801010002:山西省某市某区某学校地址
 ```
 
-> Note: **The two characters "市" and "省" are important classification basis, PLEASE DO NOT OMIT!**
+> Note: **The two characters "市" and "省" are important classification basis, PLEASE DO NOT OMIT !**
+>
+> Warning: **Submitting with non-existent data will cause the server to report an error !!!**
 
 ### 4.Test run this script
 
 - `python3 Clockin.py`
 
 ### 5.Run this script regularly on the cloud server
+
+- You can use `XQT-AutoSetup.sh` to init env and setup.
+  - Run with command `./XQT-AutoSetup.sh`
+  - **Note: You need `zsh` to run this shell script.**
+  - Install zsh:`apt install zsh`
 
 > Take ubuntu as an example below.
 
@@ -69,6 +83,14 @@ This script will record all check-in logs in the folder 'ClockinLogArchive' unde
 The format of the file name written is 'UnixTimestamp_IDNumber.log'.
 
 If a major error that cannot be checked in occurs, an'imp_error.log' file will be generated in the running directory. If such an error occurs in the future, the content will be appended to this file.
+
+## Uninstall
+
+- Remove folder XQT-Clockin
+- Remove added cron table (Use `crontab -e`)
+- Remove python package
+  - requests
+  - fake_useragent
 
 ## Q-A
 
