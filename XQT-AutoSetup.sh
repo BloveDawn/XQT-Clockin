@@ -12,8 +12,8 @@ git clone https://github.com/BloveDawn/XQT-Clockin.git
 cd $(pwd)/XQT-Clockin
 
 # Setup
-echo [!] XQT-AutoClockin Setup...
-echo [!] Section1: Setup Python Env...)
+echo '[!] XQT-AutoClockin Setup...'
+echo '[!] Section1: Setup Python Env...)'
 
 python3_path=$(where python3)
 pip3_path=$(where pip3)
@@ -30,7 +30,7 @@ fi
 pip3 install requests
 pip3 install fake_useragent
 
-echo [!] Section2: Setup crontab...
+echo '[!] Section2: Setup crontab...'
 
 current_path=$(pwd)
 
@@ -44,4 +44,4 @@ crontab -l | { cat; echo "15 18 * * * $python3_path $current_path/Clockin.py >> 
 
 service cron reload
 
-echo [!] setup end.
+echo '[!] setup end.'
