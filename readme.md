@@ -19,7 +19,7 @@ You can use `XQT-AutoSetup.sh` to **AUTO** init env and setup.
 >
 > If you are from **mainland China**, using the **Gitee** link below will speed up deployment.
 
-Download from Gitee(China): `curl -fsSL "https://gitee.com/blovedawn/XQT-Clockin/raw/main/XQT-AutoSetup.sh" | zsh`
+Download from Gitee(China): `curl -fsSL "https://gitee.com/blovedawn/XQT-Clockin/raw/main/XQT-AutoSetup-Gitee.sh" | zsh`
 
 Download from GitHub: `curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/XQT-AutoSetup.sh" | zsh`
 
