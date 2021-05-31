@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Author: Blovedawn
-# Release Date: 2021.5
+# Release Date: 2021.6
 
 # Clone from gitee
 

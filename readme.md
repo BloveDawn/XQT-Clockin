@@ -6,6 +6,8 @@
 
 This is an automatic check-in script of Shanxi Xiao Qi Tong, which can realize multi-user automatic check-in.
 
+> **It's tested on Ubuntu(Arm64) Server.**
+
 ## Use
 
 ### Note
@@ -84,7 +86,7 @@ So far everything is perfect, you can have a cup of coffee and wait for the clou
 
 This script will record all check-in logs in the folder 'ClockinLogArchive' under the current running directory.
 
-The format of the file name written is 'UnixTimestamp_IDNumber.log'.
+The format of the file name written is 'time_IDNumber.log'.
 
 If a major error that cannot be checked in occurs, an'imp_error.log' file will be generated in the running directory. If such an error occurs in the future, the content will be appended to this file.
 
