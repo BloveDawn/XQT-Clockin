@@ -10,6 +10,11 @@ git clone https://gitee.com/blovedawn/XQT-Clockin.git
 # go to XQT-AutoClockin folder
 
 cd $(pwd)/XQT-Clockin
+echo "working directory:" $(pwd)"/XQT-Clockin"
+
+# mv id_save_sample.txt to id_save.txt
+
+mv id_save_sample.txt id_save.txt
 
 # Setup
 echo '[!] XQT-AutoClockin Setup...'
