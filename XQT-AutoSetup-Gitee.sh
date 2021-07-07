@@ -38,7 +38,7 @@ python3 FakeUACacheCopy.py
 
 echo '[!] Section2: Setup crontab...'
 
-chmod +x AddCron.sh
-./AddCron.sh
+echo '[!] Run command:'$(pwd)'/AddCron.sh'
+source $(pwd)/AddCron.sh
 
 echo '[!] setup end.'
