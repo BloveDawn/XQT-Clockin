@@ -10,7 +10,7 @@ git clone https://gitee.com/blovedawn/XQT-Clockin.git
 # go to XQT-AutoClockin folder
 
 cd $(pwd)/XQT-Clockin
-echo "working directory:" $(pwd)"/XQT-Clockin"
+echo "[!] working directory:" $(pwd)"/XQT-Clockin"
 
 # mv id_save_sample.txt to id_save.txt
 
@@ -43,7 +43,7 @@ current_path=$(pwd)
 mkdir $current_path/ShellOutput # create shell output folder
 mkdir $current_path/ShellOutput/DO_NOT_DELETE_THIS_FOLDER # warning...info?
 
-crontab -l | { cat; echo "\n# XQT-AutoClockin Works"; } | crontab -
+crontab -l | { cat; echo "\n\n# XQT-AutoClockin Works\n"; } | crontab -
 crontab -l | { cat; echo "10 8 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -
 crontab -l | { cat; echo "5 12 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -
 crontab -l | { cat; echo "15 18 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -

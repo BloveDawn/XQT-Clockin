@@ -28,8 +28,8 @@ Good luck.
 
 You can use `XQT-AutoSetup.sh`(International) or `XQT-AutoSetup-Gitee.sh`(mainland China) to **AUTOMATIC** initialize environment and setup.
 
-> **Note: You need `zsh` to run this shell script.**  
-> first, install zsh: `apt install zsh`
+> **Note: You need `zsh`&`git`&`python3`&`pip` to run this shell script.**  
+> first, install: `sudo apt install zsh git python3 python3-pip`
 >
 > If you are from **mainland China**, using the **Gitee** link below will speed up deployment.
 
