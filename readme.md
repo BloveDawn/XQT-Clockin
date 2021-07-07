@@ -34,8 +34,8 @@ You can use `XQT-AutoSetup.sh`(International) or `XQT-AutoSetup-Gitee.sh`(mainla
 > If you are from **mainland China**, using the **Gitee** link below will speed up deployment.
 
 1. download and automatic deploy
-   - from Gitee(China): `curl -fsSL "https://gitee.com/blovedawn/XQT-Clockin/raw/main/XQT-AutoSetup-Gitee.sh" | zsh`
-   - from GitHub: `curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/XQT-AutoSetup.sh" | zsh`
+   - from Gitee(China): `curl -fsSL "https://gitee.com/blovedawn/XQT-Clockin/raw/main/tools/XQT-AutoSetup-Gitee.sh" | zsh`
+   - from GitHub: `curl -fsSL "https://raw.githubusercontent.com/BloveDawn/XQT-Clockin/main/tools/XQT-AutoSetup.sh" | zsh`
 2. enter information
    - Write the personal information of the person who needs to sign in to the file (default file name is 'id_save.txt') in the following format
    - > id_save.txt
