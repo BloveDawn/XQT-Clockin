@@ -38,16 +38,7 @@ python3 FakeUACacheCopy.py
 
 echo '[!] Section2: Setup crontab...'
 
-current_path=$(pwd)
-
-mkdir $current_path/ShellOutput # create shell output folder
-mkdir $current_path/ShellOutput/DO_NOT_DELETE_THIS_FOLDER # warning...info?
-
-crontab -l | { cat; echo "\n\n# XQT-AutoClockin Works\n"; } | crontab -
-crontab -l | { cat; echo "10 8 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -
-crontab -l | { cat; echo "5 12 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -
-crontab -l | { cat; echo "15 18 * * * $python3_path $current_path/Clockin.py >> \"$current_path/ShellOutput/\$(date +\"\\%Y-\\%m-\\%d_\\%H\").log\" 2>&1"; } | crontab -
-
-service cron reload
+chmod +x AddCron.sh
+./AddCron.sh
 
 echo '[!] setup end.'
