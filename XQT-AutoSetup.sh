@@ -34,6 +34,7 @@ fi
 
 pip3 install requests
 pip3 install fake_useragent
+python3 FakeUACacheCopy.py
 
 echo '[!] Section2: Setup crontab...'
 

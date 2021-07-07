@@ -41,9 +41,9 @@ You can use `XQT-AutoSetup.sh`(International) or `XQT-AutoSetup-Gitee.sh`(mainla
    - > id_save.txt
 
      ```text
-     140501199801010000:山西省某市某区某学校地址
-     140501199801010001:山西省某市某区某学校地址
-     140501199801010002:山西省某市某区某学校地址
+     140501199801010000:山西省某市某区某学校地址:remarks1
+     140501199801010001:山西省某市某区某学校地址:remarks2
+     140501199801010002:山西省某市某区某学校地址:remarks3
      ```
 
    - > Note: **The two characters "市" and "省" are important classification basis, PLEASE DO NOT OMIT !**
@@ -74,9 +74,9 @@ Write the personal information of the person who needs to sign in to the file (d
 > id_save.txt
 
 ```text
-140501199801010000:山西省某市某区某学校地址
-140501199801010001:山西省某市某区某学校地址
-140501199801010002:山西省某市某区某学校地址
+140501199801010000:山西省某市某区某学校地址:remarks1
+140501199801010001:山西省某市某区某学校地址:remarks3
+140501199801010002:山西省某市某区某学校地址:remarks4
 ```
 
 > Note: **The two characters "市" and "省" are important classification basis, PLEASE DO NOT OMIT !**
@@ -111,7 +111,7 @@ So far everything is perfect, you can have a cup of coffee and wait for the clou
 ## Logging
 
 1. This script will record all check-in logs in the folder 'ClockinLogArchive' under the current running directory.
-   - The format of the file name written is 'time_IDNumber.log'.
+   - The format of the file name written is 'time_remarks.log'.
 2. The console output is in folder `ShellOutput`.
 
 ## Uninstall
