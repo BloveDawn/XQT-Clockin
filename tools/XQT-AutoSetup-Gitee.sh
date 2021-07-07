@@ -10,7 +10,7 @@ git clone https://gitee.com/blovedawn/XQT-Clockin.git
 # go to XQT-AutoClockin folder
 
 cd $(pwd)/XQT-Clockin
-echo "[!] working directory:" $(pwd)"/XQT-Clockin"
+echo "[!] working directory:" $(pwd)
 
 # mv id_save_sample.txt to id_save.txt
 
@@ -18,6 +18,8 @@ mv id_save_sample.txt id_save.txt
 
 # Setup
 echo '[+] XQT-AutoClockin Setup...'
+cd tools
+echo "[!] working directory:" $(pwd)
 
 echo '[1] Section1: Setup Python Env...)'
 echo '[1] Run command:'$(pwd)'/InstallPython.sh'
