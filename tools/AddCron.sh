@@ -1,7 +1,7 @@
+cd ../
 current_path=$(pwd)
 python3_path=$(where python3 | grep /usr)
 
-cd ../
 echo "[2] cronadd current path:" $current_path
 
 mkdir $current_path/ShellOutput # create shell output folder
