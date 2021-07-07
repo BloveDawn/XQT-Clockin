@@ -131,6 +131,7 @@ if __name__ == "__main__":
     
     # clock in
     for person_id in person_id_list:
+        sleep(randint(0, 20)) # clock in every 0-20 seconds
         try:
             info_list = person_id.split(':') # split list with ':'
         except Exception as e_split:
@@ -142,5 +143,4 @@ if __name__ == "__main__":
         except Exception as e:
             print('[-] [' + __name__ + '] clockin func error! clockin ID:' + info_list[0] + ', addr:' + info_list[1])
         print('')
-        sleep(10) # clock in every 15 seconds
     exit()
