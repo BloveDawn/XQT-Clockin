@@ -1,5 +1,3 @@
-FAKE_UA_CACHE_NAME = 'fake_useragent_0.1.11.json'
-
 CLOCKIN_URL = "http://yx.ty-ke.com/Home/Monitor/monitor_add" # clock in URL
 
 DEFAULT_STR = {
