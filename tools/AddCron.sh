@@ -1,7 +1,8 @@
 current_path=$(pwd)
 python3_path=$(where python3 | grep /usr)
 
-echo "[!] cronadd current path:" $current_path
+cd ../
+echo "[2] cronadd current path:" $current_path
 
 mkdir $current_path/ShellOutput # create shell output folder
 mkdir $current_path/ShellOutput/DO_NOT_DELETE_THIS_FOLDER # warning...info?
