@@ -2,7 +2,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
-import base64
 from Config import *
  
 class SendEmail(object):
@@ -18,12 +17,14 @@ class SendEmail(object):
         self.email_from = None
         self.password = None
         self.email_to = None
+        self.email_cc = None
+        self.email_bcc = None
         self.email_title = None
         self.email_content = None
         self.attach_path = None
         self.attach_path_list = None
  
-    def set_args(self, email_from_in:str=None, password_in:str=None, email_to_in:list=None, email_title_in:str=None, email_content_in:str=None, email_attach_path_in:list=None):
+    def set_args(self, email_from_in:str=None, password_in:str=None, email_to_in:list=None, email_cc_in:list=None, email_bcc_in:list=None, email_title_in:str=None, email_content_in:str=None, email_attach_path_in:list=None):
         if email_from_in:
             self.email_from = email_from_in
             if not password_in:
@@ -34,6 +35,8 @@ class SendEmail(object):
             self.email_from = self._email_address
             self.password = self._email_password
         self.email_to = ','.join(email_to_in)
+        self.email_cc = ','.join(email_cc_in)
+        self.email_bcc = ','.join(email_bcc_in)
         self.email_title = email_title_in
         self.email_content = email_content_in
         if email_attach_path_in is not None:
@@ -44,6 +47,8 @@ class SendEmail(object):
         multi_part = MIMEMultipart()
         multi_part['From'] = self.email_from
         multi_part['To'] = self.email_to
+        multi_part['Cc'] = self.email_cc
+        multi_part['Bcc'] = self.email_bcc
         multi_part['Subject'] = Header(self.email_title, "utf-8")
 
         email_body = MIMEText(self.email_content, 'plain', 'utf-8')
@@ -55,7 +60,7 @@ class SendEmail(object):
             attach["Content-Type"] = 'application/octet-stream'
             attach_file_name = str(attach_path.split('/')[-1])
             attach.add_header('Content-Disposition', 'attachment', filename=attach_file_name.encode('UTF-8').decode())
-            print(attach['Content-Disposition'])
+            print('[!] email attach file:' + attach_file_name)
             multi_part.attach(attach)
 
         # send email

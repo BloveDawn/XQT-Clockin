@@ -189,7 +189,7 @@ if __name__ == "__main__":
             EMAIL_TEXT['TITLE'] = 'Please check errors when clock in XQT'
             EMAIL_TEXT['CONTENT'] = '\n\n'.join(ERROR_TEXT_LIST)
             email_send = SendEmail()
-            email_send.set_args(email_to_in=EMAIL_RECEIVERS, email_title_in=EMAIL_TEXT.get('TITLE'), email_content_in=EMAIL_TEXT.get('CONTENT'), email_attach_path_in=EMAIL_ATTACH_PATH_LIST)
+            email_send.set_args(email_to_in=EMAIL_RECEIVERS, email_cc_in=EMAIL_CC, email_bcc_in=EMAIL_BCC, email_title_in=EMAIL_TEXT.get('TITLE'), email_content_in=EMAIL_TEXT.get('CONTENT'), email_attach_path_in=EMAIL_ATTACH_PATH_LIST)
             email_send.send_email()
     
     # exit

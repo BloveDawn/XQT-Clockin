@@ -6,3 +6,11 @@ DEFAULT_STR = {
     'ADDRESS': '山西省某市某地址', # default clockin address
     'USERAGENT': 'Mozilla/5.0 (Linux; Android 10; Redmi K30 5G Build/QKQ1.191222.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.99 Mobile Safari/537.36 Mobads', # default user-agent
 }
+
+IPAGENT_URL = "http://www.66ip.cn/"
+
+EMAIL_ATTACH_PATH_LIST = []
+EMAIL_TEXT = {
+    'TITLE': 'A DEFAULT EMAIL TITLE',
+    'CONTENT': 'THIS IS DEFAULT EMAIL CONTENT',
+}
