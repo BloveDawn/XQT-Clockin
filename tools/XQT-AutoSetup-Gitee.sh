@@ -12,9 +12,10 @@ git clone https://gitee.com/blovedawn/XQT-Clockin.git
 cd $(pwd)/XQT-Clockin
 echo "[!] working directory:" $(pwd)
 
-# mv id_save_sample.txt to id_save.txt
+# Rename file
 
 mv id_save_sample.txt id_save.txt
+mv Config_sample.py Config.py
 
 # Setup
 echo '[+] XQT-AutoClockin Setup...'
