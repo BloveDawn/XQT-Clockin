@@ -1,4 +1,3 @@
-IP_AGENT_ENABLED = False
 EMAIL_ENABLED = False
 
 EMAIL_RECEIVERS = ['example1@example.com', 'example2@example.com']
