@@ -9,10 +9,10 @@ class SendEmail(object):
         super(SendEmail, self).__init__()
  
         # default value
-        self._smtp_host = EMAIL_SENDER.get('SMTP_HOST')
-        self._smtp_port = EMAIL_SENDER.get('SMTP_PORT')
-        self._email_address = EMAIL_SENDER.get('EMAIL_ADDRESS')
-        self._email_password = EMAIL_SENDER.get('EMAIL_PASSWORD')
+        self._smtp_host = EMAIL_SENDER_HOST
+        self._smtp_port = EMAIL_SENDER_PORT
+        self._email_address = EMAIL_ADDRESS
+        self._email_password = EMAIL_PASSWORD
  
         self.email_from = None
         self.password = None

@@ -1,29 +1,36 @@
 # Author: Blovedawn
-# Release Date: 2021.6
-
-# Updated Date: 2021.7.11
+# Date: 2021/07/19
 
 import os
+from sys import path as global_str_current_path
+from time import strftime, localtime, sleep
 from random import randint, shuffle
 from json import loads as JsonLoads
-from time import strftime, localtime, sleep
-from sys import path as current_path
 from re import split as SplitString
+from threading import Thread, active_count, Lock
 from requests import post as RequestPost # pip install requests
 from fake_useragent import UserAgent # pip install fake_useragent
 from SendMail import SendEmail
-from Const import *
 from Config import *
+from Const import *
 
-ERROR_TEXT_LIST = []
+GLOBAL_STR_CLOCKIN_URL = "http://yx.ty-ke.com/Home/Monitor/monitor_add" # clock in URL
+GLOBAL_LIST_TASK = []
+GLOBAL_LIST_ERROR_INFO = []
+GLOBAL_LIST_EMAIL_ATTACH_PATH = []
 
-def Clockin(person_id_in:str, person_address_in:str, person_remarks_in:str) -> str:
-     
-    # data field
-    base_info_text = '[*] error info: remarks:' + person_remarks_in + ', id:' + person_id_in + ', address:' + person_address_in + '\n'
-    request_header = {'User-Agent': ''}
-    request_data = {
-    'mobile': '', # actually this field is the ID number
+class Clockin():
+    
+    # person info
+    _str_person_info = None
+    _str_person_id = None
+    _str_person_address = None
+    _str_person_remarks = None
+    
+    # post data
+    _dict_request_header = {'User-Agent': ''}
+    _dict_request_data = {
+    'mobile': '', # actually this field is the person id
     'title': '36.', # temperature
     'jk_type': '健康',
     'wc_type': '否',
@@ -35,162 +42,175 @@ def Clockin(person_id_in:str, person_address_in:str, person_remarks_in:str) -> s
     'is_verify': '0',
     }
     
-    # parameters check
-    if len(person_id_in) == 0:
-        ERROR_TEXT_LIST.append(base_info_text)
-        return '[!] error: person id not exsits!'
-    if len(person_address_in) == 0:
-        person_address_in = DEFAULT_STR.get('ADDRESS')
-    if len(person_remarks_in) == 0:
-        person_remarks_in = "Unknown"
+    # other
+    _str_clockin_time = None
+    _str_output_log_file_name = None
+    _str_thread_name = None
     
-    # initialize log write
-    log_folder_path = current_path[0] + '/' + DEFAULT_STR.get('SAVE_LOG_FOLDER_NAME') + '/'
-    if not os.path.exists(log_folder_path):
-        os.mkdir(log_folder_path)
-    log_file_path = log_folder_path + strftime("%Y-%m-%d-%H-%M-%S", localtime()) + '_' + person_remarks_in + '.log'
-    log_file = open(log_file_path, 'w+')
-    log_file.write('[!] time:' + strftime("%Y-%m-%d-%H-%M-%S", localtime()) + '\n')
-    log_file.write('[!] person info: id:' + person_id_in + ', remarks:' + person_remarks_in + '\n')
+    # is success
+    _b_is_success = False
     
-    # input field
-    try:
-        request_header['User-Agent'] = UserAgent(use_cache_server=False).random # get a random user-agent
-    except Exception:
-        request_header['User-Agent'] = DEFAULT_STR.get('USERAGENT') # default ua
+    def __init__(self, str_person_info_in:str, str_thread_name_in:str) -> None:
+        # init param
+        self._str_clockin_time = strftime("%Y-%m-%d-%H-%M-%S", localtime())
+        self._str_thread_name = str_thread_name_in
+        
+        if len(str_person_info_in) <= 0:
+            raise Exception('[-] [' + self._str_thread_name + '] [' + __name__ + ']  clockin init error: person info is empty string.')
+        list_person_info = str_person_info_in.split(':') # split info line with ':'
+        self._str_person_id = list_person_info[0] # get person id
+        self._str_person_address = list_person_info[1] # get person address
+        if len(self._str_person_id) <= 0 or len(self._str_person_address) <= 0:
+            raise Exception('[-] [' + self._str_thread_name + '] [' + __name__ + ']  clockin init error: split args has empty string.')
+        
+        self._str_person_remarks = list_person_info[2] # get person remarks
+        if len(self._str_person_remarks) <= 0:
+            self._str_person_remarks = STR_DEFAULT_PERSON_REMARKS
+        
+        self._str_output_log_file_name = global_str_current_path[0] + '/' + STR_DEFAULT_SAVE_LOG_FOLDER_NAME + '/' + self._str_clockin_time + '_' + self._str_person_remarks + '.log' # log file path
+        self.write_log_print('[!] [' + self._str_thread_name + '] [' + __name__ + '] time: ' + self._str_clockin_time)
+        
+        try:
+            self._dict_request_header['User-Agent'] = UserAgent(use_cache_server=False).random # get a random user-agent
+        except Exception:
+            self._dict_request_header['User-Agent'] = STR_DEFAULT_USERAGENT # default ua
+        
+        self._dict_request_data['title'] += str(randint(0, 8)) # random temperature from 36.0 to 36.8
+        self._dict_request_data['mobile'] = self._str_person_id
+        if len(self._dict_request_data['mobile']) != 18:
+            self.write_log_print_raise('[-] [' + self._str_thread_name + '] [' + __name__ + '] error: person id is not 18.')
+            
+        # address
+        try:
+            list_address = SplitString('[省市]', self._str_person_address)
+            self._dict_request_data['address'] = self._str_person_address
+        except:
+            list_address = SplitString('[省市]', STR_DEFAULT_ADDRESS)
+            self._dict_request_data['address'] = STR_DEFAULT_ADDRESS
+        self._dict_request_data['province'] = list_address[0] + '省'
+        self._dict_request_data['city'] = list_address[1] + '市'
+        self._dict_request_data['district'] = list_address[2]
+        self.write_log('[+] init success.')
     
-    request_data['title'] += str(randint(0, 8)) # random temperature from 36.0 to 36.8
-    request_data['mobile'] = person_id_in
+    def run_clockin(self) -> bool:
+        self.write_log_print('[!] [' + self._str_thread_name + '] [' + __name__ + '] person_remarks:' + self._str_person_remarks + ', person_id:' + self._str_person_id + ', person_address:' + self._str_person_address)
+        try:
+            if(DEBUG_ENABLED):
+                str_response_text = open('debug_response.txt').read()
+            else:
+                str_response_text = RequestPost(url=GLOBAL_STR_CLOCKIN_URL, data=self._dict_request_data, headers=self._dict_request_header).text
+            response_json_data = JsonLoads(str_response_text)
+        except Exception as e:
+            self.write_log('[!] response origin data: ' + str(str_response_text))
+            self.write_log_print_raise('[-] [' + self._str_thread_name + '] [' + __name__ + '] request or load server response error: ' + str(e))
+        response_code = response_json_data['code']
+        response_msg = response_json_data['msg']
+        # print info to log file
+        if response_code == '200':
+            self.write_log('[+] success 200')
+        else:
+            self.write_log('[-] error code: ' + str(response_code))
+        self.write_log('[!] message: ' + str(response_msg))
+        self.write_log('[!] request post URL: ' + str(GLOBAL_STR_CLOCKIN_URL))
+        self.write_log('[!] request post data: ' + str(self._dict_request_data))
+        self.write_log('[!] request head data: ' + str(self._dict_request_header))
+        self.write_log('[!] response json data: ' + str(response_json_data))
+        if response_code != '200':
+            self.write_log_print_raise('[-] server error code: ' + response_code + ', time:' + self._str_clockin_time + ', person remarks:' + self._str_person_remarks + ', person id:' + self._str_person_id)
+        self._b_is_success = True
+        return self._b_is_success
+        
+    def write_log(self, str_in:str) -> None:
+        f_logfile = open(self._str_output_log_file_name , 'a+')
+        f_logfile.write(str_in + '\n')
+        f_logfile.flush()
+        f_logfile.close()
+        
+    def write_log_print(self, str_in:str) -> None:
+        print(str_in)
+        self.write_log(str_in)
     
-    if request_data['mobile'] == '':
-        error_text_id_empty = '[-] error, person id is empty\n'
-        log_file.write(error_text_id_empty)
-        log_file.flush()
-        log_file.close()
-        ERROR_TEXT_LIST.append(base_info_text + error_text_id_empty)
-        return log_file_path
-    elif len(request_data['mobile']) != 18:
-        error_text_id18 = '[-] error, person id is not 18\n'
-        log_file.write(error_text_id18)
-        log_file.flush()
-        log_file.close()
-        ERROR_TEXT_LIST.append(base_info_text + error_text_id18)
-        return log_file_path
+    def write_log_print_raise(self, str_in:str) -> None:
+        self.write_log_print(str_in)
+        raise Exception(str_in)
+        
+    def get_failed_log_file_path(self):
+        if not self._b_is_success:
+            return self._str_output_log_file_name
+        else:
+            return None
 
-    request_data['address'] = person_address_in
+GLOBAL_THREAD_LOCK = Lock()
+
+class RunThread(Thread):
+    _list_person_info = None
     
-    address_list = SplitString('[省市]', person_address_in)
-    if len(address_list) != 3:
-        error_text_address = '[-] error address list:' + str(address_list) + '\n'
-        log_file.write(error_text_address)
-        log_file.flush()
-        log_file.close()
-        ERROR_TEXT_LIST.append(base_info_text + error_text_address)
-        return log_file_path
-    
-    request_data['province'] = address_list[0] + '省'
-    request_data['city'] = address_list[1] + '市'
-    request_data['district'] = address_list[2]
-    
-    # post to URL
-    response_page = RequestPost(url=CLOCKIN_URL, data=request_data, headers=request_header).text
-    try: # try to load response json
-        response_json_data = JsonLoads(response_page)
-    except Exception as e:
-        print('[-] [' + __name__ + '] runtime error: ' + str(e) + '\n[-] time:' + strftime("%Y-%m-%d-%H-%M-%S", localtime()) + ' person_id:' + person_id_in + ', addr:' + person_address_in + ', remarks:' + person_remarks_in)
-        error_text_json_load = '[-] json load error: ' + str(e) + '\n'
-        log_file.write(error_text_json_load)
-        log_file.write('[!] original response page text:\n' + response_page + '\n')
-        log_file.flush()
-        log_file.close()
-        error_text_server_error = '[-] [' + __name__ + '] clockin server return error! person_id:' + person_id_in + ', remarks:' + person_remarks_in
-        print(error_text_server_error)
-        ERROR_TEXT_LIST.append(base_info_text + error_text_json_load + error_text_server_error)
-        return log_file_path
-    response_code = response_json_data['code']
-    response_msg = response_json_data['msg']
-    
-    # print info to log file
-    if response_code == '400':
-        log_file.write('[-] error 400\n')
-        log_file.write('[-]')
-    elif response_code == '200':
-        log_file.write('[+] success 200\n')
-        log_file.write('[+]')
-    else:
-        log_file.write('[-] unknow error code:' + str(response_code) + '\n')
-        log_file.write('[-]')
-    log_file.write(' message: ' + str(response_msg) + '\n')
-    log_file.write('[!] request post URL: ' + str(CLOCKIN_URL) + '\n')
-    log_file.write('[!] request post data: ' + str(request_data) + '\n')
-    log_file.write('[!] request head data: ' + str(request_header) + '\n')
-    log_file.write('[!] response data: ' + str(response_json_data) + '\n')
-    
-    # release log file
-    log_file.flush()
-    log_file.close()
-    if response_code == '400':
-        error_text_400 = '[-] server return 400, dont resent data.'
-        ERROR_TEXT_LIST.append(base_info_text + error_text_400)
-        return log_file_path
-    return None
+    def __init__(self, str_thread_name_in, list_person_info_in) -> None:
+        super(RunThread, self).__init__(name=str_thread_name_in)
+        self._list_person_info = list_person_info_in
+        
+    def run(self) -> None:
+        print('[T] thread started: ' + self.name)
+        for str_person_info in self._list_person_info:
+            print('[T] [thread: ' + self.name + '] [' +__name__ + '] clockin info:' + str_person_info)
+            sleep(randint(3, 15)) # clock in random 0-20 seconds
+            GLOBAL_THREAD_LOCK.acquire(True) # lock
+            clock_in_obj = Clockin(str_person_info, self.name)
+            b_success = False
+            try:
+                b_success = clock_in_obj.run_clockin()
+            except Exception as e:
+                if DEBUG_ENABLED: print('[D] debug: ' + str(b_success)) # debug
+                str_log_path = clock_in_obj.get_failed_log_file_path()
+                if str_log_path is not None:
+                    GLOBAL_LIST_EMAIL_ATTACH_PATH.append(str_log_path)
+                GLOBAL_LIST_ERROR_INFO.append(str(e))
+            GLOBAL_THREAD_LOCK.release() # release lock
 
 if __name__ == "__main__":
-    # get current path
-    script_run_path = current_path[0] + '/'
-    print('[+] [' + __name__ + '] script running path:' + script_run_path)
+    print('[!] XQT Clockin v2.0 By blovedawn')
+    print('[!] [' + __name__ + '] running time: ' + strftime("%Y-%m-%d-%H:%M:%S", localtime()))
+    print('[!] [' + __name__ + '] script running path:' + global_str_current_path[0] + '/')
     
-    # log running time
-    print('[!] running time:' + strftime("%Y-%m-%d-%H-%M-%S", localtime()))
+    # check log file folder
+    log_folder_path = global_str_current_path[0] + '/' + STR_DEFAULT_SAVE_LOG_FOLDER_NAME + '/'
+    if not os.path.exists(log_folder_path):
+        print('[+] [' + __name__ + '] create log folder: ' + log_folder_path)
+        os.mkdir(log_folder_path)
     
-    # get person_id_list from file DEFAULT_STR['SAVE_ID_FILE_NAME']
+    # get list_person_info from file STR_DEFAULT_SAVE_ID_FILE_NAME
     try:
-        person_info_list = open(script_run_path + DEFAULT_STR.get('SAVE_ID_FILE_NAME'), 'r').read().splitlines()
-        if len(person_info_list) == 0:
-            error_text_list_empty = '[-] [' + __name__ + '] read person id list file ' + DEFAULT_STR.get('SAVE_ID_FILE_NAME') + ' error, file is empty!'
-            ERROR_TEXT_LIST.append(error_text_list_empty)
-            print(error_text_list_empty)
+        list_person_info = open(global_str_current_path[0] + '/' + STR_DEFAULT_SAVE_ID_FILE_NAME, 'r').read().splitlines()
+        if len(list_person_info) == 0:
+            str_error_list_empty = '[-] [' + __name__ + '] read person id list file ' + STR_DEFAULT_SAVE_ID_FILE_NAME + ' error, file is empty!'
+            GLOBAL_LIST_ERROR_INFO.append(str_error_list_empty)
+            print(str_error_list_empty)
             exit()
     except Exception as e:
-        error_text_file_error = '[-] [' + __name__ + '] read id list file ' + DEFAULT_STR.get('SAVE_ID_FILE_NAME') + ' error: ' + str(e)
-        ERROR_TEXT_LIST.append(error_text_file_error)
-        print(error_text_file_error)
+        str_error_file_error = '[-] [' + __name__ + '] read id list file ' + STR_DEFAULT_SAVE_ID_FILE_NAME + ' error: ' + str(e)
+        GLOBAL_LIST_ERROR_INFO.append(str_error_file_error)
+        print(str_error_file_error)
         exit()
+
+    # random and re-group person list
+    shuffle(list_person_info)
+    list_person_info_grouped = []
+    for i in range(0, len(list_person_info), INT_PERSON_GROUP_COUNT):
+        list_person_info_grouped.append(list_person_info[i:i+INT_PERSON_GROUP_COUNT])
     
-    # random sort person info list
-    shuffle(person_info_list)
+    # run multi thread
+    for list_person_info in list_person_info_grouped:
+        RunThread(strftime("%Y-%m-%d-%H:%M:%S", localtime()), list_person_info).start()
+        sleep(randint(3, 5))
+    while(active_count() > 1): # wait for all sub threads
+        print('[!] [' + __name__ + '] waiting ' + str(active_count()) + ' sub threads...')
+        sleep(5)
     
-    # clock in
-    for person_info in person_info_list:
-        sleep(randint(5, 25)) # clock in every 0-20 seconds
-        try:
-            person_info_list = person_info.split(':') # split info line with ':'
-            person_id = person_info_list[0] # get person id
-            person_address = person_info_list[1] # get person address
-            person_remarks = person_info_list[2] # get person remarks
-        except Exception as e_split:
-            error_text_split = '[-] [' + __name__ + '] split id error:' + str(e_split)
-            ERROR_TEXT_LIST.append(error_text_split)
-            print(error_text_split)
-            continue
-        print('[+] [' + __name__ + '] clockin id:' + person_id + ', addr:' + person_address + ', remarks:' + person_remarks)
-        try:
-            error_info = Clockin(person_id, person_address, person_remarks)
-            if error_info is not None:
-                EMAIL_ATTACH_PATH_LIST.append(error_info)
-        except Exception as e:
-            error_text_unknown = '[-] [' + __name__ + '] unknown clockin func error! clockin ID:' + person_id + ', addr:' + person_address + ', remarks:' + person_remarks
-            ERROR_TEXT_LIST.append(error_text_unknown)
-            print(error_text_unknown)
-    
-    # send error info email
+    # email send error info
     if EMAIL_ENABLED:
-        if len(ERROR_TEXT_LIST) != 0:
-            EMAIL_TEXT['TITLE'] = 'Please check errors when clock in XQT'
-            EMAIL_TEXT['CONTENT'] = '\n\n'.join(ERROR_TEXT_LIST)
+        if len(GLOBAL_LIST_ERROR_INFO) != 0:
+            STR_DEFAULT_EMAIL_TITLE = 'Please check errors when clock in XQT'
+            STR_DEFAULT_EMAIL_CONTENT = '\n\n'.join(GLOBAL_LIST_ERROR_INFO) + '\n\n'
             email_send = SendEmail()
-            email_send.set_args(email_to_in=EMAIL_RECEIVERS, email_cc_in=EMAIL_CC, email_bcc_in=EMAIL_BCC, email_title_in=EMAIL_TEXT.get('TITLE'), email_content_in=EMAIL_TEXT.get('CONTENT'), email_attach_path_in=EMAIL_ATTACH_PATH_LIST)
+            email_send.set_args(email_to_in=EMAIL_RECEIVERS, email_cc_in=EMAIL_CC, email_bcc_in=EMAIL_BCC, email_title_in=STR_DEFAULT_EMAIL_TITLE, email_content_in=STR_DEFAULT_EMAIL_CONTENT, email_attach_path_in=GLOBAL_LIST_EMAIL_ATTACH_PATH)
             email_send.send_email()
-    
-    # exit
-    exit()
