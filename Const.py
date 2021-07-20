@@ -1,5 +1,6 @@
 STR_DEFAULT_SAVE_ID_FILE_NAME = 'id_save.txt' # save id to this file
 STR_DEFAULT_SAVE_LOG_FOLDER_NAME = 'ClockinLogArchive' # save log to this folder
+STR_DEFAULT_SHELL_OUTPUT_FOLDER_NAME = 'ShellOutput' # shell output folder
 
 STR_DEFAULT_PERSON_REMARKS = '未知'
 STR_DEFAULT_ADDRESS = '山西省太原市迎泽区' # default clockin address

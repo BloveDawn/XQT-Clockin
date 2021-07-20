@@ -173,10 +173,14 @@ if __name__ == "__main__":
     print('[!] [' + __name__ + '] script running path:' + global_str_current_path[0] + '/')
     
     # check log file folder
-    log_folder_path = global_str_current_path[0] + '/' + STR_DEFAULT_SAVE_LOG_FOLDER_NAME + '/'
-    if not os.path.exists(log_folder_path):
-        print('[+] [' + __name__ + '] create log folder: ' + log_folder_path)
-        os.mkdir(log_folder_path)
+    str_log_folder_path = global_str_current_path[0] + '/' + STR_DEFAULT_SAVE_LOG_FOLDER_NAME + '/'
+    if not os.path.exists(str_log_folder_path):
+        print('[+] [' + __name__ + '] create log folder: ' + str_log_folder_path)
+        os.mkdir(str_log_folder_path)
+    str_shell_output_folder_path = global_str_current_path[0] + '/' + STR_DEFAULT_SHELL_OUTPUT_FOLDER_NAME + '/'
+    if not os.path.exists(str_shell_output_folder_path):
+        print('[+] [' + __name__ + '] create log folder: ' + str_shell_output_folder_path)
+        os.mkdir(str_shell_output_folder_path)
     
     # get list_person_info from file STR_DEFAULT_SAVE_ID_FILE_NAME
     try:

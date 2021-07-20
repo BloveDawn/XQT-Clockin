@@ -64,7 +64,13 @@ class SendEmail(object):
             multi_part.attach(attach)
 
         # send email
-        smtp_server = smtplib.SMTP_SSL(host=self._smtp_host, port=self._smtp_port)
+        smtp_server = None
+        try:
+            smtp_server = smtplib.SMTP_SSL(host=self._smtp_host, port=self._smtp_port)
+        except:
+            smtp_server = smtplib.SMTP(host=self._smtp_host, port=self._smtp_port)
+            smtp_server.ehlo()        
+            smtp_server.starttls()
         try:
             smtp_server.login(self.email_from, self.password)
             smtp_server.sendmail(self.email_from, self.email_to, multi_part.as_string())
@@ -79,4 +85,12 @@ class SendEmail(object):
                 print("[-] " + __name__  + " smtp quit fail")
             else:
                 print("[+] " + __name__  + " smtp quit success")
- 
+
+if __name__ == '__main__':
+    from Const import *
+    from Config import *
+    from sys import path as str_current_path
+    print('[!] Test send email...')
+    email_send = SendEmail()
+    email_send.set_args(email_to_in=EMAIL_RECEIVERS, email_cc_in=EMAIL_CC, email_bcc_in=EMAIL_BCC, email_title_in=STR_DEFAULT_EMAIL_TITLE, email_content_in=STR_DEFAULT_EMAIL_CONTENT, email_attach_path_in=[str_current_path[0] + '/' + 'debug_response.txt'])
+    email_send.send_email()
